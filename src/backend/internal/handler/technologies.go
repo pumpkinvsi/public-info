@@ -1,13 +1,17 @@
 package handler
 
 import (
+	"log/slog"
 	"net/http"
-
-	"src/backend/internal/model"
 )
 
 // GET /api/v1/technologies
 func (h *Handler) GetTechnologies(w http.ResponseWriter, r *http.Request) {
-	// TODO: implement
-	respondJSON(w, http.StatusOK, []model.Technology{})
+	techs, err := h.store.ListTechnologies(r.Context())
+	if err != nil {
+		slog.Error("list technologies", "error", err)
+		respondError(w, http.StatusInternalServerError, "internal error")
+		return
+	}
+	respondJSON(w, http.StatusOK, techs)
 }

@@ -6,14 +6,16 @@ import (
 	"net/http"
 
 	"src/backend/internal/config"
+	"src/backend/internal/repository"
 )
 
 type Handler struct {
-	cfg *config.Config
+	cfg   *config.Config
+	store repository.Store
 }
 
-func New(cfg *config.Config) *Handler {
-	return &Handler{cfg: cfg}
+func New(cfg *config.Config, store repository.Store) *Handler {
+	return &Handler{cfg: cfg, store: store}
 }
 
 func respondJSON(w http.ResponseWriter, status int, v any) {

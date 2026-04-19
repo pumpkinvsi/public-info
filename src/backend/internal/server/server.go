@@ -17,6 +17,7 @@ import (
 	"src/backend/internal/config"
 	"src/backend/internal/handler"
 	"src/backend/internal/metrics"
+	"src/backend/internal/repository"
 )
 
 const (
@@ -30,8 +31,8 @@ type Server struct {
 	httpServer *http.Server
 }
 
-func New(cfg *config.Config) *Server {
-	h := handler.New(cfg)
+func New(cfg *config.Config, store repository.Store) *Server {
+	h := handler.New(cfg, store)
 	r := buildRouter(h)
 
 	return &Server{
