@@ -6,8 +6,9 @@ type LocalizedString struct {
 }
 
 type Level struct {
-	ID   int    `json:"id"`
-	Text string `json:"text"`
+	ID    int    `json:"id"`
+	Level int    `json:"level"`
+	Text  string `json:"text"`
 }
 
 type Contact struct {
@@ -25,11 +26,11 @@ type Skill struct {
 }
 
 type Project struct {
-	ID          int             `json:"id"`
-	Name        LocalizedString `json:"name"`
-	Description LocalizedString `json:"description"`
-	Skills      []Skill         `json:"skills"`
-	Note        LocalizedString `json:"note"`
+	ID          int              `json:"id"`
+	Name        LocalizedString  `json:"name"`
+	Description LocalizedString  `json:"description"`
+	Skills      []Skill          `json:"skills"`
+	Note        *LocalizedString `json:"note"`
 }
 
 type Technology struct {

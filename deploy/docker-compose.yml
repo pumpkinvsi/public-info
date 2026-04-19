@@ -34,6 +34,8 @@ services:
         condition: service_healthy
       kafka-init:
         condition: service_completed_successfully
+      migrator:
+        condition: service_completed_successfully
     healthcheck:
       test: ["CMD", "curl", "-f", "http://localhost:8080/health/live"]
       interval: 15s
@@ -80,7 +82,49 @@ services:
       timeout: 5s
       retries: 5
       start_period: 10s
+        networks:
+      - backend
+    restart: unless-stopped
+    logging:
+      driver: loki
+      options:
+        loki-url: "http://localhost:3100/loki/api/v1/push"
+        loki-external-labels: "app=postgres"
+
+  migrator:
+    image: migrate/migrate:v4.17.1
+    depends_on:
+      postgres:
+        condition: service_healthy
+    volumes:
+      - ../scripts/db:/migrations:ro
+    command: >
+      -path=/migrations
+      -database=postgres://${POSTGRES_USER}:${POSTGRES_PASSWORD}@postgres:5432/${POSTGRES_DB}?sslmode=disable
+      up
     networks:
+      - backend
+    restart: on-failure
+    logging:
+      driver: loki
+      options:
+        loki-url: "http://localhost:3100/loki/api/v1/push"
+        loki-external-labels: "app=migrator"
+
+  pgadmin:
+    image: dpage/pgadmin4:latest
+    environment:
+      PGADMIN_DEFAULT_EMAIL: ${PGADMIN_EMAIL}
+      PGADMIN_DEFAULT_PASSWORD: ${PGADMIN_PASSWORD}
+    ports:
+      - "5050:80"
+    volumes:
+      - pgadmin_data:/var/lib/pgadmin
+    depends_on:
+      postgres:
+        condition: service_healthy
+    networks:
+      - web
       - backend
     restart: unless-stopped
 
@@ -191,3 +235,4 @@ volumes:
   prometheus_data:
   grafana_data:
   loki_data:
+  pgadmin_data:
