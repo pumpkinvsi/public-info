@@ -82,7 +82,7 @@ services:
       timeout: 5s
       retries: 5
       start_period: 10s
-        networks:
+    networks:
       - backend
     restart: unless-stopped
     logging:
