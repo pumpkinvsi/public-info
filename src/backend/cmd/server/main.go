@@ -8,14 +8,19 @@ import (
 	"syscall"
 
 	"src/backend/internal/config"
+	"src/backend/internal/logging"
 	"src/backend/internal/server"
 )
 
 func main() {
-	logger := slog.New(slog.NewJSONHandler(os.Stdout, &slog.HandlerOptions{
-		Level: slog.LevelInfo,
-	}))
-	slog.SetDefault(logger)
+
+	logging.Setup(
+		slog.LevelInfo,
+		"http://loki:3100",
+		map[string]string{
+			"app": "backend",
+		},
+	)
 
 	cfg, err := config.Load()
 	if err != nil {
