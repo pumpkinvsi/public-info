@@ -16,7 +16,9 @@ RUN CGO_ENABLED=0 GOOS=linux GOARCH=amd64 \
       -o /backend \
       ./cmd/server
 
-FROM scratch
+FROM alpine:3.23
+
+RUN apk add --no-cache curl
 
 COPY --from=builder /etc/ssl/certs/ca-certificates.crt /etc/ssl/certs/
 
