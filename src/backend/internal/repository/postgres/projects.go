@@ -8,16 +8,11 @@ import (
 	"src/backend/internal/model"
 )
 
-// projKey is a composite map key that uniquely identifies a project
-// within a specific technology group. The same project may appear under
-// multiple technologies, so projectID alone is not sufficient.
 type projKey struct {
 	techID    int
 	projectID int
 }
 
-// ListProjectsGrouped returns all projects nested under their technology groups.
-// A single JOIN query is used; aggregation into the nested structure is done in Go.
 func (s *Store) ListProjectsGrouped(ctx context.Context) ([]model.ProjectGroup, error) {
 	const query = `
 		SELECT
@@ -49,8 +44,8 @@ func (s *Store) ListProjectsGrouped(ctx context.Context) ([]model.ProjectGroup, 
 
 	var (
 		groups  []model.ProjectGroup
-		techIdx = make(map[int]int)     // techID → index in groups
-		projIdx = make(map[projKey]int) // (techID, projectID) → index in group.Projects
+		techIdx = make(map[int]int)
+		projIdx = make(map[projKey]int)
 	)
 
 	for rows.Next() {
@@ -60,7 +55,7 @@ func (s *Store) ListProjectsGrouped(ctx context.Context) ([]model.ProjectGroup, 
 			projectID   int
 			nameRaw     []byte
 			descRaw     []byte
-			noteRaw     []byte // NULL if not set
+			noteRaw     []byte
 			skillID     *int
 			skillName   *string
 			levelID     *int
@@ -77,7 +72,6 @@ func (s *Store) ListProjectsGrouped(ctx context.Context) ([]model.ProjectGroup, 
 			return nil, fmt.Errorf("scan project row: %w", err)
 		}
 
-		// ── technology group ────────────────────────────────────────────────
 		tIdx, exists := techIdx[techID]
 		if !exists {
 			groups = append(groups, model.ProjectGroup{
@@ -88,7 +82,6 @@ func (s *Store) ListProjectsGrouped(ctx context.Context) ([]model.ProjectGroup, 
 			techIdx[techID] = tIdx
 		}
 
-		// ── project within group ────────────────────────────────────────────
 		pk := projKey{techID: techID, projectID: projectID}
 		pIdx, exists := projIdx[pk]
 		if !exists {
@@ -121,7 +114,6 @@ func (s *Store) ListProjectsGrouped(ctx context.Context) ([]model.ProjectGroup, 
 			projIdx[pk] = pIdx
 		}
 
-		// ── skill (LEFT JOIN — may be absent) ──────────────────────────────
 		if skillID != nil {
 			groups[tIdx].Projects[pIdx].Skills = append(
 				groups[tIdx].Projects[pIdx].Skills,

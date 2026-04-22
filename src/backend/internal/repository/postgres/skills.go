@@ -9,7 +9,6 @@ import (
 	"src/backend/internal/model"
 )
 
-// ListSkills returns all skills joined with their proficiency level.
 func (s *Store) ListSkills(ctx context.Context) ([]model.Skill, error) {
 	const query = `
 		SELECT

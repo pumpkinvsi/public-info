@@ -9,7 +9,6 @@ import (
 	"src/backend/internal/model"
 )
 
-// ListTechnologies returns all technology entries ordered by id.
 func (s *Store) ListTechnologies(ctx context.Context) ([]model.Technology, error) {
 	const query = `SELECT id, name FROM technologies ORDER BY id`
 

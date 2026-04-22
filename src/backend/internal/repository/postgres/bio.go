@@ -8,7 +8,6 @@ import (
 	"src/backend/internal/model"
 )
 
-// GetBio fetches the single biography row from the info table.
 func (s *Store) GetBio(ctx context.Context) (*model.Bio, error) {
 	const query = `SELECT bio FROM info WHERE id = 1`
 

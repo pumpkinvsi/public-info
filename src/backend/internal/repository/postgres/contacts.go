@@ -9,7 +9,6 @@ import (
 	"src/backend/internal/model"
 )
 
-// ListContacts returns all contact entries ordered by id.
 func (s *Store) ListContacts(ctx context.Context) ([]model.Contact, error) {
 	const query = `SELECT name, value FROM contacts ORDER BY id`
 
