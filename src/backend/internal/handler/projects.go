@@ -2,12 +2,14 @@ package handler
 
 import (
 	"net/http"
-
-	"src/backend/internal/model"
 )
 
 // GET /api/v1/projects
 func (h *Handler) GetProjects(w http.ResponseWriter, r *http.Request) {
-	// TODO: implement
-	respondJSON(w, http.StatusOK, []model.ProjectGroup{})
+	projects, err := h.store.ListProjectsGrouped(r.Context())
+	if err != nil {
+		respondError(w, http.StatusInternalServerError, "internal error")
+		return
+	}
+	respondJSON(w, http.StatusOK, projects)
 }
