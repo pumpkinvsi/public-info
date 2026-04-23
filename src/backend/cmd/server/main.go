@@ -70,7 +70,6 @@ func main() {
 
 	defer cancel()
 
-	// Worker pool runs in background. Run blocks until ctx is cancelled.
 	go pool.Run(ctx)
 
 	srv := server.New(cfg, *store, outboxRepository)
