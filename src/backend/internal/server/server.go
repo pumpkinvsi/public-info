@@ -14,10 +14,18 @@ import (
 	"github.com/go-chi/cors"
 	"github.com/prometheus/client_golang/prometheus/promhttp"
 
-	"src/backend/internal/config"
-	"src/backend/internal/handler"
-	"src/backend/internal/metrics"
-	"src/backend/internal/repository"
+	"src/backend/internal/data/bio"
+	"src/backend/internal/data/contacts"
+	"src/backend/internal/data/projects"
+	"src/backend/internal/data/skills"
+	"src/backend/internal/data/technologies"
+	"src/backend/internal/email"
+	"src/backend/internal/health"
+
+	"src/backend/internal/shared/config"
+	"src/backend/internal/shared/db"
+	"src/backend/internal/shared/metrics"
+	"src/backend/internal/shared/outbox"
 )
 
 const (
@@ -31,9 +39,8 @@ type Server struct {
 	httpServer *http.Server
 }
 
-func New(cfg *config.Config, store repository.Store) *Server {
-	h := handler.New(cfg, store)
-	r := buildRouter(h)
+func New(cfg *config.Config, db db.Postgres, outbox outbox.Outbox) *Server {
+	r := buildRouter(&db)
 
 	return &Server{
 		httpServer: &http.Server{
@@ -75,7 +82,7 @@ func (s *Server) Run(ctx context.Context) error {
 	return nil
 }
 
-func buildRouter(h *handler.Handler) *chi.Mux {
+func buildRouter(db *db.Postgres) *chi.Mux {
 	r := chi.NewRouter()
 
 	r.Use(middleware.RequestID)
@@ -94,19 +101,13 @@ func buildRouter(h *handler.Handler) *chi.Mux {
 
 	r.Handle("/metrics", promhttp.Handler())
 
-	r.Route("/health", func(r chi.Router) {
-		r.Get("/live", h.Liveness)
-		r.Get("/ready", h.Readiness)
-	})
-
-	r.Route("/api/v1", func(r chi.Router) {
-		r.Get("/bio", h.GetBio)
-		r.Get("/skills", h.GetSkills)
-		r.Get("/projects", h.GetProjects)
-		r.Get("/technologies", h.GetTechnologies)
-		r.Get("/contacts", h.GetContacts)
-		r.Post("/email", h.SendEmail)
-	})
+	health.RegisterRoutes(r, db)
+	bio.RegisterRoutes(r, db)
+	contacts.RegisterRoutes(r, db)
+	skills.RegisterRoutes(r, db)
+	projects.RegisterRoutes(r, db)
+	technologies.RegisterRoutes(r, db)
+	email.RegisterRoutes(r, db)
 
 	return r
 }

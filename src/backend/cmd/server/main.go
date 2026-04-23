@@ -8,10 +8,12 @@ import (
 	"syscall"
 	"time"
 
-	"src/backend/internal/config"
-	"src/backend/internal/logging"
-	"src/backend/internal/repository/postgres"
 	"src/backend/internal/server"
+	"src/backend/internal/shared/config"
+	"src/backend/internal/shared/db"
+	"src/backend/internal/shared/kafka"
+	"src/backend/internal/shared/logging"
+	"src/backend/internal/shared/outbox"
 )
 
 const dbConnectTimeout = 10 * time.Second
@@ -35,7 +37,7 @@ func main() {
 	connectCtx, connectCancel := context.WithTimeout(context.Background(), dbConnectTimeout)
 	defer connectCancel()
 
-	store, err := postgres.New(connectCtx, cfg.Database)
+	store, err := db.New(connectCtx, cfg.Database)
 	if err != nil {
 		slog.Error("failed to connect to database", "error", err)
 		os.Exit(1)
@@ -44,10 +46,34 @@ func main() {
 
 	slog.Info("database connection established")
 
-	srv := server.New(cfg, store)
+	producer, err := kafka.New(cfg.Kafka)
+	if err != nil {
+		slog.Error("failed to create kafka producer", "error", err)
+		os.Exit(1)
+	}
+	defer func() {
+		if err := producer.Close(); err != nil {
+			slog.Error("kafka producer close", "error", err)
+		}
+	}()
+
+	outboxRepository := outbox.NewRepository(store)
+
+	pool := outbox.NewWorkerPool(
+		cfg.Kafka.WorkerCount,
+		cfg.Kafka.PollInterval,
+		outboxRepository,
+		producer,
+	)
 
 	ctx, cancel := signal.NotifyContext(context.Background(), syscall.SIGINT, syscall.SIGTERM)
+
 	defer cancel()
+
+	// Worker pool runs in background. Run blocks until ctx is cancelled.
+	go pool.Run(ctx)
+
+	srv := server.New(cfg, *store, outboxRepository)
 
 	if err := srv.Run(ctx); err != nil {
 		slog.Error("server terminated with error", "error", err)
