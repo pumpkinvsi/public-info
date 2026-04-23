@@ -73,8 +73,8 @@ func Load() (*Config, error) {
 	return cfg, nil
 }
 
-func (c *Config) validate() error {
-	if c.Database.Password == "" {
+func (c *Config) validate() error { // TODO: implement
+	if strings.TrimSpace(c.Database.Password) == "" {
 		return fmt.Errorf("DB_PASSWORD environment variable is required")
 	}
 	return nil
