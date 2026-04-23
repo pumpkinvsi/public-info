@@ -5,11 +5,11 @@ import (
 	"encoding/json"
 	"fmt"
 
-	"src/backend/internal/shared/model"
 	"src/backend/internal/shared/db"
+	"src/backend/internal/shared/model"
 )
 
-type Store interface {
+type store interface {
 	GetBio(ctx context.Context) (*Bio, error)
 }
 
@@ -17,7 +17,7 @@ type repository struct {
 	db *db.Postgres
 }
 
-func NewRepository(db *db.Postgres) *repository {
+func newRepository(db *db.Postgres) *repository {
 	return &repository{
 		db: db,
 	}

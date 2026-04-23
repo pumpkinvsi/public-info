@@ -99,7 +99,7 @@ func TestGetProjects(t *testing.T) {
 			t.Parallel()
 
 			store := &mockStore{ListProjectsGroupedFn: tc.mockFn}
-			h := NewHandler(store)
+			h := newHandler(store)
 
 			req := httptest.NewRequest(http.MethodGet, "/api/v1/projects", nil)
 			rec := httptest.NewRecorder()
@@ -138,7 +138,7 @@ func TestGetProjectsNilNoteSerialisation(t *testing.T) {
 			}, nil
 		},
 	}
-	h := NewHandler(store)
+	h := newHandler(store)
 
 	req := httptest.NewRequest(http.MethodGet, "/api/v1/projects", nil)
 	rec := httptest.NewRecorder()

@@ -71,7 +71,7 @@ func TestGetBio(t *testing.T) {
 			t.Parallel()
 
 			store := &mockStore{GetBioFn: tc.mockFn}
-			h := NewHandler(store)
+			h := newHandler(store)
 
 			req := httptest.NewRequest(http.MethodGet, "/api/v1/bio", nil)
 			rec := httptest.NewRecorder()

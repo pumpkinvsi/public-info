@@ -7,15 +7,15 @@ import (
 	"net/mail"
 	"strings"
 
-	"src/backend/internal/shared/outbox"
 	httpUtils "src/backend/internal/shared/http"
+	"src/backend/internal/shared/outbox"
 )
 
 type handler struct {
 	outbox outbox.Outbox
 }
 
-func NewHandler(outbox outbox.Outbox) *handler {
+func newHandler(outbox outbox.Outbox) *handler {
 	return &handler{
 		outbox: outbox,
 	}

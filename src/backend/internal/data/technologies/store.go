@@ -9,7 +9,7 @@ import (
 	"src/backend/internal/shared/db"
 )
 
-type Store interface {
+type store interface {
 	ListTechnologies(ctx context.Context) ([]Technology, error)
 }
 
@@ -17,7 +17,7 @@ type repository struct {
 	db *db.Postgres
 }
 
-func NewRepository(db *db.Postgres) *repository {
+func newRepository(db *db.Postgres) *repository {
 	return &repository{
 		db: db,
 	}

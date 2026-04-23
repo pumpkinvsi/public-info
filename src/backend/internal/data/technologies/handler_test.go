@@ -61,7 +61,7 @@ func TestGetTechnologies(t *testing.T) {
 			t.Parallel()
 
 			store := &mockStore{ListTechnologiesFn: tc.mockFn}
-			h := NewHandler(store)
+			h := newHandler(store)
 
 			req := httptest.NewRequest(http.MethodGet, "/api/v1/technologies", nil)
 			rec := httptest.NewRecorder()

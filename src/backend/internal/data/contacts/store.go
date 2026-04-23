@@ -4,11 +4,12 @@ import (
 	"context"
 	"fmt"
 
-	"github.com/jackc/pgx/v5"
 	"src/backend/internal/shared/db"
+
+	"github.com/jackc/pgx/v5"
 )
 
-type Store interface {
+type store interface {
 	ListContacts(ctx context.Context) ([]Contact, error)
 }
 
@@ -16,7 +17,7 @@ type repository struct {
 	db *db.Postgres
 }
 
-func NewRepository(db *db.Postgres) *repository {
+func newRepository(db *db.Postgres) *repository {
 	return &repository{
 		db: db,
 	}

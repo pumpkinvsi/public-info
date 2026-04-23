@@ -60,7 +60,7 @@ func TestGetContacts(t *testing.T) {
 			t.Parallel()
 
 			store := &mockStore{ListContactsFn: tc.mockFn}
-			h := NewHandler(store)
+			h := newHandler(store)
 
 			req := httptest.NewRequest(http.MethodGet, "/api/v1/contacts", nil)
 			rec := httptest.NewRecorder()
@@ -92,7 +92,7 @@ func TestGetContactsResponseEnvelope(t *testing.T) {
 			return []Contact{{Name: "Email", Value: "me@example.com"}}, nil
 		},
 	}
-	h := NewHandler(store)
+	h := newHandler(store)
 
 	req := httptest.NewRequest(http.MethodGet, "/api/v1/contacts", nil)
 	rec := httptest.NewRecorder()

@@ -60,7 +60,7 @@ func TestSendEmail(t *testing.T) {
 		t.Run(tc.name, func(t *testing.T) {
 			t.Parallel()
 
-			h := NewHandler(&mockOutbox{})
+			h := newHandler(&mockOutbox{})
 
 			req := httptest.NewRequest(http.MethodPost, "/api/v1/email", strings.NewReader(tc.body))
 			req.Header.Set("Content-Type", "application/json")

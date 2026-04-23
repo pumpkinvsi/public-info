@@ -8,7 +8,7 @@ import (
 )
 
 func RegisterRoutes(r chi.Router, db *db.Postgres) {
-	h := NewHandler(outbox.NewRepository(db))
+	h := newHandler(outbox.NewRepository(db))
 
 	r.Post("/email", h.SendEmail)
 }

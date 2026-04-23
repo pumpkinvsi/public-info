@@ -62,7 +62,7 @@ func TestGetSkills(t *testing.T) {
 			t.Parallel()
 
 			store := &mockStore{ListSkillsFn: tc.mockFn}
-			h := NewHandler(store)
+			h := newHandler(store)
 
 			req := httptest.NewRequest(http.MethodGet, "/api/v1/skills", nil)
 			rec := httptest.NewRecorder()
